@@ -5,83 +5,104 @@ const pool = require("./db");
 
 //middleware
 app.use(cors());
-app.use(express.json()); //req.body
+app.use(express.json());
 
-//ROUTES//
-
-//create a todo
-
-app.post("/todos", async (req, res) => {
+//view1
+app.get("/view1", async (req, res) => {
   try {
-    const { description } = req.body;
-    const newTodo = await pool.query(
-      "INSERT INTO todo (description) VALUES($1) RETURNING *",
-      [description]
+    const viewData = await pool.query(
+      "SELECT * FROM public.availableroomsperarea"
     );
-
-    res.json(newTodo.rows[0]);
+    res.json(viewData.rows);
   } catch (err) {
-    console.error(err.message);
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-//get all todos
-
-app.get("/todos", async (req, res) => {
+//view2
+app.get("/view2", async (req, res) => {
   try {
-    const allTodos = await pool.query("SELECT * FROM todo");
-    res.json(allTodos.rows);
+    const viewData = await pool.query("SELECT * FROM public.hotelcapacity");
+    res.json(viewData.rows);
   } catch (err) {
-    console.error(err.message);
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-//get a todo
-
-app.get("/todos/:id", async (req, res) => {
+//get all bookings
+app.get("/bookings", async (req, res) => {
   try {
-    const { id } = req.params;
-    const todo = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
-      id
-    ]);
-
-    res.json(todo.rows[0]);
+    let query = `SELECT * FROM booking 
+                 ORDER BY bookingid ASC`
+    // Check if customer parameter is provided
+    if (req.query.customer) {
+        const customer = req.query.customer;
+        query = `
+        SELECT Booking.BookingID, Customer.FullName, Booking.StartDate, Booking.EndDate 
+        FROM Booking 
+        JOIN Customer ON Booking.CustomerID = Customer.CustomerID 
+        WHERE Customer.FullName = '${customer}'
+        `;
+    }
+    console.log(query)
+    const viewData = await pool.query(query);
+    res.json(viewData.rows);
   } catch (err) {
-    console.error(err.message);
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-//update a todo
-
-app.put("/todos/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { description } = req.body;
-    const updateTodo = await pool.query(
-      "UPDATE todo SET description = $1 WHERE todo_id = $2",
-      [description, id]
-    );
-
-    res.json("Todo was updated!");
-  } catch (err) {
-    console.error(err.message);
-  }
+// Get all hotels or filter by location
+app.get("/hotels", async (req, res) => {
+    try {
+      let query = `SELECT * FROM hotel`;
+  
+      // Check if location parameter is provided
+      if (req.query.location) {
+        const location = req.query.location;
+        query += ` WHERE Address LIKE '%${location}%'`;
+      }
+  
+      query += ` ORDER BY hotelid ASC;`;
+  
+      const allHotels = await pool.query(query);
+      res.json(allHotels.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
 });
 
-//delete a todo
 
-app.delete("/todos/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleteTodo = await pool.query("DELETE FROM todo WHERE todo_id = $1", [
-      id
-    ]);
-    res.json("Todo was deleted!");
-  } catch (err) {
-    console.log(err.message);
-  }
-});
+//get number of hotels in each hotel chain
+app.get("/chain-hotels", async (req, res) => {
+    try {
+      const data = await pool.query(`
+        SELECT ChainID, COUNT(*) AS NumberOfHotels FROM Hotel GROUP BY ChainID;
+      `);
+      res.json(data.rows);
+    } catch (err) {
+      console.error("Database query error:", err.message);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+//get all the hotels that have a higher number of rooms than the average number of room per hotel in the database
+app.get("/room-avg-high", async (req, res) => {
+    try {
+      const data = await pool.query(`
+      SELECT * FROM Hotel WHERE NumberOfRooms > (SELECT AVG(NumberOfRooms) FROM Hotel);
+      `);
+      res.json(data.rows);
+    } catch (err) {
+      console.error("Database query error:", err.message);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
 app.listen(5000, () => {
-  console.log("server has started on port 5000");
+  console.log("Server is starting on port 5000");
 });
