@@ -76,6 +76,18 @@ app.get("/hotels", async (req, res) => {
     }
 });
 
+//get all rooms for hotel
+app.get("/hotel-rooms/:hotelId", async (req, res) => {
+  try {
+    let query = `SELECT * FROM room WHERE hotelid = ${req.params.hotelId}`;
+    const allRooms = await pool.query(query);
+    res.json(allRooms.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 //get number of hotels in each hotel chain
 app.get("/chain-hotels", async (req, res) => {
