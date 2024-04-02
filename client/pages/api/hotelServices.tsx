@@ -1,5 +1,16 @@
 import axios from "axios";
 
+type Hotel = {
+  hotelid: number;
+  name: string;
+  chainid: number;
+  rating: number;
+  numberofrooms: number;
+  address: string;
+  email: string;
+  contactphone: string;
+};
+
 export const getAllHotels = async (location?: string) => {
   try {
     const response = await axios.get(
@@ -7,7 +18,7 @@ export const getAllHotels = async (location?: string) => {
         location ? `?location=${location}` : ""
       }`
     );
-    return response.data;
+    return response.data as Hotel[];
   } catch (error) {
     // Handle error
     console.error(error);
