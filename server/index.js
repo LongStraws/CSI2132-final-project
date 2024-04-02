@@ -46,7 +46,6 @@ app.get("/bookings", async (req, res) => {
         WHERE Customer.FullName = '${customer}'
         `;
     }
-    console.log(query)
     const viewData = await pool.query(query);
     res.json(viewData.rows);
   } catch (err) {
