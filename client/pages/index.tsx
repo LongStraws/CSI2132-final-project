@@ -14,10 +14,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ReqForm from "@/components/ReqForm";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
-interface Hotel {
+export interface Hotel {
   hotelid: number;
   name: string;
   chainid: number;
@@ -73,12 +74,14 @@ export default function Home() {
         </TableHeader>
         <TableBody>
           {allHotels.map((allHotels) => (
+            <Link href={`/hotel/${allHotels.hotelid}`} legacyBehavior>
             <TableRow key={allHotels.name}>
               <TableCell className='font-medium'>{allHotels.chainid}</TableCell>
               <TableCell>{allHotels.name}</TableCell>
               <TableCell>{allHotels.rating}</TableCell>
               <TableCell className='text-right'>{allHotels.address}</TableCell>
             </TableRow>
+            </Link>
           ))}
         </TableBody>
       </Table>

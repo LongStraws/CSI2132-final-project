@@ -28,7 +28,7 @@ export const getAllHotels = async (location?: string) => {
 export const getHotelRooms = async (hotelId: number) => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}/hotel-rooms/${hotelId}`
+      `${process.env.NEXT_PUBLIC_HOST}hotel-rooms/${hotelId}`
     );
     return response.data;
   } catch (error) {
@@ -36,3 +36,14 @@ export const getHotelRooms = async (hotelId: number) => {
     console.error(error);
   }
 };
+
+export const getHotel = async (hotelId: number) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_HOST}hotel/${hotelId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error)
+  }
+}
