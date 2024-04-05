@@ -31,14 +31,20 @@ export interface Hotel {
 export default function Home() {
   const [allHotels, setAllHotels] = useState<Hotel[]>([]);
   const [location, setLocation] = useState<string>("");
+  const [chainId, setChainID] = useState<number>();
+  const [rating, setRating] = useState<number>();
 
   const fetchAllHotels = async () => {
     const hotels = await getAllHotels();
     setAllHotels(hotels!);
   };
-  const fetchHotelLocation = async (location: string) => {
-    console.log(location, "location");
-    const hotels = await getAllHotels(location);
+  const fetchHotelLocation = async (
+    location: string,
+    chainId?: number,
+    rating?: number
+  ) => {
+    const hotels = await getAllHotels(location, chainId, rating);
+    console.log(location, chainId, rating);
     setAllHotels(hotels!);
   };
 
@@ -54,33 +60,56 @@ export default function Home() {
       '
       >
         <Input
-          className='test'
+          className='location-input'
           onChange={(e) => setLocation(e.target.value)}
+          placeholder='Enter Location'
         ></Input>
-        <Button onClick={() => fetchHotelLocation(location)}>
+        <Input
+          className='chainID-input'
+          onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
+          onChange={(e) => setChainID(parseInt(e.target.value))}
+          placeholder='Enter Chain ID'
+        ></Input>
+        <Input
+          className='Rating-input'
+          onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
+          onChange={(e) => setRating(parseInt(e.target.value))}
+          placeholder='Enter Rating'
+        ></Input>
+        <Button onClick={() => fetchHotelLocation(location, chainId, rating)}>
           {" "}
-          Submit Location
+          Submit Query
         </Button>
       </div>
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>A list of your hotels.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className='w-[100px]'>ChainId</TableHead>
+            <TableHead className='w-[100px]'>Hotelid</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Rating</TableHead>
+            <TableHead>ChainID</TableHead>
+            <TableHead className='text-right'>Rating</TableHead>
+            <TableHead className='text-right'>NumberOfRooms</TableHead>
             <TableHead className='text-right'>Address</TableHead>
+            <TableHead className='text-right'>Email</TableHead>
+            <TableHead className='text-right'>Phone</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allHotels.map((allHotels) => (
-            <Link href={`/hotel/${allHotels.hotelid}`} legacyBehavior>
-            <TableRow key={allHotels.name}>
-              <TableCell className='font-medium'>{allHotels.chainid}</TableCell>
-              <TableCell>{allHotels.name}</TableCell>
-              <TableCell>{allHotels.rating}</TableCell>
-              <TableCell className='text-right'>{allHotels.address}</TableCell>
-            </TableRow>
+          {allHotels.map((Hotel) => (
+            <Link href={`/hotel/${Hotel.hotelid}`} legacyBehavior>
+              <TableRow key={Hotel.hotelid}>
+                <TableCell className='font-medium'>{Hotel.hotelid}</TableCell>
+                <TableCell className='font-medium'>{Hotel.name}</TableCell>
+                <TableCell className='font-medium'>{Hotel.chainid}</TableCell>
+                <TableCell>{Hotel.rating}</TableCell>
+                <TableCell>{Hotel.numberofrooms}</TableCell>
+                <TableCell className='text-right'>{Hotel.address}</TableCell>
+                <TableCell className='text-right'>{Hotel.email}</TableCell>
+                <TableCell className='text-right'>
+                  {Hotel.contactphone}
+                </TableCell>
+              </TableRow>
             </Link>
           ))}
         </TableBody>

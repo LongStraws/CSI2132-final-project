@@ -35,11 +35,11 @@ app.get("/view2", async (req, res) => {
 app.get("/bookings", async (req, res) => {
   try {
     let query = `SELECT * FROM booking 
-                 ORDER BY bookingid ASC`
+                 ORDER BY bookingid ASC`;
     // Check if customer parameter is provided
     if (req.query.customer) {
-        const customer = req.query.customer;
-        query = `
+      const customer = req.query.customer;
+      query = `
         SELECT Booking.BookingID, Customer.FullName, Booking.StartDate, Booking.EndDate 
         FROM Booking 
         JOIN Customer ON Booking.CustomerID = Customer.CustomerID 
@@ -66,25 +66,44 @@ app.get("/hotel/:hotelId", async (req, res) => {
   }
 });
 
-// Get all hotels or filter by location
+// Get all hotels or filter by location, chain, or rating
 app.get("/hotels", async (req, res) => {
-    try {
-      let query = `SELECT * FROM hotel`;
-  
-      // Check if location parameter is provided
-      if (req.query.location) {
-        const location = req.query.location;
-        query += ` WHERE Address LIKE '%${location}%'`;
-      }
-  
-      query += ` ORDER BY hotelid ASC;`;
-  
-      const allHotels = await pool.query(query);
-      res.json(allHotels.rows);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error");
+  try {
+    let query = `SELECT * FROM hotel`;
+
+    // Check if location parameter is provided
+    if (req.query.location) {
+      const location = req.query.location;
+      query += ` WHERE Address LIKE '%${location}%'`;
     }
+
+    if (req.query.chain) {
+      const chain = req.query.chain;
+      if (query.includes("WHERE")) {
+        query += ` LIKE ChainID = ${chain}`;
+      } else {
+        query += ` WHERE ChainID = ${chain}`;
+      }
+    }
+
+    // Check if rating parameter is provided
+    if (req.query.rating) {
+      const rating = req.query.rating;
+      if (query.includes("WHERE")) {
+        query += ` AND Rating = ${rating}`;
+      } else {
+        query += ` WHERE Rating = ${rating}`;
+      }
+    }
+
+    query += ` ORDER BY hotelid ASC;`;
+
+    const allHotels = await pool.query(query);
+    res.json(allHotels.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 //get all rooms for hotel
@@ -99,32 +118,31 @@ app.get("/hotel-rooms/:hotelId", async (req, res) => {
   }
 });
 
-
 //get number of hotels in each hotel chain
 app.get("/chain-hotels", async (req, res) => {
-    try {
-      const data = await pool.query(`
+  try {
+    const data = await pool.query(`
         SELECT ChainID, COUNT(*) AS NumberOfHotels FROM Hotel GROUP BY ChainID;
       `);
-      res.json(data.rows);
-    } catch (err) {
-      console.error("Database query error:", err.message);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+    res.json(data.rows);
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 //get all the hotels that have a higher number of rooms than the average number of room per hotel in the database
 app.get("/room-avg-high", async (req, res) => {
-    try {
-      const data = await pool.query(`
+  try {
+    const data = await pool.query(`
       SELECT * FROM Hotel WHERE NumberOfRooms > (SELECT AVG(NumberOfRooms) FROM Hotel);
       `);
-      res.json(data.rows);
-    } catch (err) {
-      console.error("Database query error:", err.message);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+    res.json(data.rows);
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.listen(5000, () => {
   console.log("Server is starting on port 5000");

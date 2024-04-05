@@ -11,13 +11,27 @@ type Hotel = {
   contactphone: string;
 };
 
-export const getAllHotels = async (location?: string) => {
+export const getAllHotels = async (
+  location?: string,
+  chainId?: number,
+  rating?: number
+) => {
   try {
+    let queryString = "";
+    if (location) {
+      queryString += `?location=${location}`;
+    }
+    if (chainId) {
+      queryString += `${queryString ? "&" : "?"}chain=${chainId}`;
+    }
+    if (rating) {
+      queryString += `${queryString ? "&" : "?"}rating=${rating}`;
+    }
+
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}hotels${
-        location ? `?location=${location}` : ""
-      }`
+      `${process.env.NEXT_PUBLIC_HOST}hotels${queryString}`
     );
+    console.log(queryString);
     return response.data as Hotel[];
   } catch (error) {
     // Handle error
@@ -44,6 +58,6 @@ export const getHotel = async (hotelId: number) => {
     );
     return response.data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
