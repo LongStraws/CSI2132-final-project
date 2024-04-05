@@ -97,20 +97,20 @@ export default function Home() {
         </TableHeader>
         <TableBody>
           {allHotels.map((Hotel) => (
-            <Link href={`/hotel/${Hotel.hotelid}`} legacyBehavior>
-              <TableRow key={Hotel.hotelid}>
-                <TableCell className='font-medium'>{Hotel.hotelid}</TableCell>
-                <TableCell className='font-medium'>{Hotel.name}</TableCell>
-                <TableCell className='font-medium'>{Hotel.chainid}</TableCell>
-                <TableCell>{Hotel.rating}</TableCell>
-                <TableCell>{Hotel.numberofrooms}</TableCell>
-                <TableCell className='text-right'>{Hotel.address}</TableCell>
-                <TableCell className='text-right'>{Hotel.email}</TableCell>
-                <TableCell className='text-right'>
-                  {Hotel.contactphone}
-                </TableCell>
-              </TableRow>
-            </Link>
+            <TableRow key={Hotel.hotelid}>
+              <TableCell className='font-medium'>
+                <Link href={`/hotel/${Hotel.hotelid}`}>
+                  <Button>{Hotel.hotelid}</Button>{" "}
+                </Link>
+              </TableCell>
+              <TableCell className='font-medium'>{Hotel.name}</TableCell>{" "}
+              <TableCell className='font-medium'>{Hotel.chainid}</TableCell>
+              <TableCell>{Hotel.rating}</TableCell>
+              <TableCell>{Hotel.numberofrooms}</TableCell>
+              <TableCell className='text-right'>{Hotel.address}</TableCell>
+              <TableCell className='text-right'>{Hotel.email}</TableCell>
+              <TableCell className='text-right'>{Hotel.contactphone}</TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
