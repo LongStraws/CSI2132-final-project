@@ -68,3 +68,14 @@ export const getHotel = async (hotelId: number) => {
     console.log(error);
   }
 };
+
+export const getView = async (viewNum: number) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_HOST}view${viewNum}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

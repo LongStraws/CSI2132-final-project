@@ -31,15 +31,15 @@ import {
 } from "@/components/ui/alert"
 
 export interface Room {
-    roomid: number;
-    hotelid: number;
-    price: string;
-    amenities: string;
-    capacity: string;
-    view: string;
-    extendable: boolean;
-    problems: null | string[];
-  }
+  roomid: number;
+  hotelid: number;
+  price: string;
+  amenities: string;
+  capacity: string;
+  view: string;
+  extendable: boolean;
+  problems: null | string[];
+}
 
   const FormSchema = z.object({
     startDate: z.date().optional(),
@@ -47,7 +47,7 @@ export interface Room {
   })
 
 const HotelPage = () => {
-    const router = useRouter()
+  const router = useRouter();
 
     const [hotelRooms, setHotelRooms] = useState<Room[]>([])
     const [hotel, setHotel] = useState<Hotel[]>([])
@@ -161,23 +161,26 @@ const HotelPage = () => {
         setHotel(hotel);
     };
 
-    useEffect(() => {
-        const fetchHotelData = async () => {
-          if (router.isReady) {
-            const numericId = typeof router.query.id === 'string' ? parseInt(router.query.id, 10) : NaN;
-      
-            if (!isNaN(numericId)) {
-              await fetchHotelRooms(numericId);
-              await fetchHotel(numericId);
-            } else {
-              console.error('Hotel ID is invalid');
-              // Optionally, redirect or show an error message
-            }
-          }
-        };
-      
-        fetchHotelData();
-      }, [router.isReady, router.query.id]);
+  useEffect(() => {
+    const fetchHotelData = async () => {
+      if (router.isReady) {
+        const numericId =
+          typeof router.query.id === "string"
+            ? parseInt(router.query.id, 10)
+            : NaN;
+
+        if (!isNaN(numericId)) {
+          await fetchHotelRooms(numericId);
+          await fetchHotel(numericId);
+        } else {
+          console.error("Hotel ID is invalid");
+          // Optionally, redirect or show an error message
+        }
+      }
+    };
+
+    fetchHotelData();
+  }, [router.isReady, router.query.id]);
   return (
     <>
 <Form {...form}>
@@ -216,14 +219,14 @@ const HotelPage = () => {
     <Table>
         <TableCaption>A list of available rooms for hotel {hotel[0]?.name}</TableCaption>
         <TableHeader>
-            <TableRow>
-                <TableHead className='w-96'>Amenities</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Capacity</TableHead>
-                <TableHead>View</TableHead>
-                <TableHead>Extendable</TableHead>
-                <TableHead className='text-right'></TableHead>
-            </TableRow>
+          <TableRow>
+            <TableHead className='w-96'>Amenities</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Capacity</TableHead>
+            <TableHead>View</TableHead>
+            <TableHead>Extendable</TableHead>
+            <TableHead className='text-right'></TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
             {hotelRooms.map((room) => (
@@ -239,9 +242,9 @@ const HotelPage = () => {
                 </TableRow>
             ))}
         </TableBody>
-    </Table>
+      </Table>
     </>
-  )
-}
+  );
+};
 
-export default HotelPage
+export default HotelPage;
