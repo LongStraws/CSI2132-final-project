@@ -96,7 +96,7 @@ export default function Home() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allHotels.map((Hotel) => (
+          {allHotels?.map((Hotel) => (
             <Link href={`/hotel/${Hotel.hotelid}`} legacyBehavior>
               <TableRow key={Hotel.hotelid}>
                 <TableCell className='font-medium'>{Hotel.hotelid}</TableCell>

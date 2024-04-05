@@ -39,10 +39,17 @@ export const getAllHotels = async (
   }
 };
 
-export const getHotelRooms = async (hotelId: number) => {
+export const getHotelRooms = async (hotelId: number, start_date?: string, end_date?: string) => {
   try {
+    let query = ''
+    if (start_date) {
+      query += `?start_date=${start_date}`;
+    }
+    if (end_date) {
+      query += `${start_date ? "&" : "?"}end_date=${end_date}`;
+    }
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}hotel-rooms/${hotelId}`
+      `${process.env.NEXT_PUBLIC_HOST}hotel-rooms/${hotelId}${query}`
     );
     return response.data;
   } catch (error) {

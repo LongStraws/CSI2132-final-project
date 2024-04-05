@@ -79,12 +79,13 @@ app.get("/hotels", async (req, res) => {
 
     if (req.query.chain) {
       const chain = req.query.chain;
+      // Correctly append with 'AND' and use '=' for equality check
       if (query.includes("WHERE")) {
-        query += ` LIKE ChainID = ${chain}`;
+        query += ` AND ChainID = '${chain}'`; // Assuming ChainID is a string; use without quotes if it's a numeric type
       } else {
-        query += ` WHERE ChainID = ${chain}`;
+        query += ` WHERE ChainID = '${chain}'`;
       }
-    }
+    }    
 
     // Check if rating parameter is provided
     if (req.query.rating) {
@@ -109,14 +110,49 @@ app.get("/hotels", async (req, res) => {
 //get all rooms for hotel
 app.get("/hotel-rooms/:hotelId", async (req, res) => {
   try {
-    let query = `SELECT * FROM room WHERE hotelid = ${req.params.hotelId}`;
-    const allRooms = await pool.query(query);
+    const { start_date, end_date } = req.query;
+    let query = `
+      SELECT r.* FROM room r
+      WHERE r.hotelid = $1`;
+
+    let queryParams = [req.params.hotelId];
+
+    // If both start_date and end_date are provided
+    if (start_date && end_date) {
+      query += `
+        AND r.roomid NOT IN (
+          SELECT b.roomid FROM booking b
+          WHERE b.startdate <= $3 AND b.enddate >= $2
+        )`;
+      queryParams.push(start_date, end_date);
+    }
+    // If only start_date is provided
+    else if (start_date) {
+      query += `
+        AND r.roomid NOT IN (
+          SELECT b.roomid FROM booking b
+          WHERE b.enddate >= $2
+        )`;
+      queryParams.push(start_date);
+    }
+    // If only end_date is provided
+    else if (end_date) {
+      query += `
+        AND r.roomid NOT IN (
+          SELECT b.roomid FROM booking b
+          WHERE b.startdate <= $2
+        )`;
+      queryParams.push(end_date);
+    }
+
+    const allRooms = await pool.query(query, queryParams);
     res.json(allRooms.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 });
+
 
 //get number of hotels in each hotel chain
 app.get("/chain-hotels", async (req, res) => {
