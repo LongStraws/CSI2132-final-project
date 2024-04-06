@@ -1,12 +1,12 @@
-DBMS : PostgreSQL
-Programming languages: JavaScript, TypeScript, react, nodejs, HTML, CSS
+DBMS: PostgreSQL
+Programming languages: JavaScript, TypeScript, react, node.js, HTML, CSS
 
-Installation guide (must have Node.js installed, with postgres):
+Installation guide (must have Node.js installed, with Postgres):
 
-- Navigate to project directory
-- In each sub directory (client and server) run command npm install
-- To start client web app, run npm run dev
-- In server directory, make a file called db.js
+- Navigate to the project directory
+- In each sub-directory (client and server) run the command `npm install`
+- To start the client web app, run `npm run dev`
+- In the server directory, make a file called `db.js`
 - In the `db.js` file, add the following code to establish a connection to the PostgreSQL database:
 
 ```javascript
@@ -22,6 +22,6 @@ const pool = new Pool({
 module.exports = pool;
 ```
 
-- Copy paste the database.sql, and import into postgres, or copy paste into the command line
-- Navigate to the server directory and run node index.js to start the server
+- Copy and paste the `database.sql`, and import it into Postgres, or copy-paste into the command line
+- Navigate to the server directory and run `node index.js` to start the server
 - You're ready to start using the application!
