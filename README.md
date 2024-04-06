@@ -8,9 +8,9 @@ Installation guide (must have Node.js installed, with postgres):
 - To start client web app, run npm run dev
 - In server directory, make a file called db.js
 - In the `db.js` file, add the following code to establish a connection to the PostgreSQL database:
-  const { Pool } = require('pg');
 
 ```javascript
+const { Pool } = require("pg");
 const pool = new Pool({
   user: "your_username",
   host: "your_host",
