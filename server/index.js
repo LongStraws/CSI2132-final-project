@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const pool = require("./db");
+const { format } = require('date-fns');
 
 //middleware
 app.use(cors());
@@ -31,6 +32,56 @@ app.get("/view2", async (req, res) => {
   }
 });
 
+//get customers
+app.get("/customers", async (req, res) => {
+  try {
+    const viewData = await pool.query(
+      `SELECT * FROM public.customer
+       ORDER BY customerid ASC`
+    );
+    res.json(viewData.rows);
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//get customer
+app.get("/customer/:customerId", async (req, res) => {
+  try {
+    const viewData = await pool.query(
+      `SELECT * FROM Customer WHERE CustomerId = ${req.params.customerId}`
+    );
+    res.json(viewData.rows);
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//create customer
+app.post('/customer', async (req, res) => {
+  const { fullName, address, idType, idNumber } = req.body;
+
+  // Automatically set registration date to current date
+  const registrationDate = format(new Date(), 'yyyy-MM-dd');
+
+  // SQL query to insert customer
+  const query = `
+    INSERT INTO Customer (FullName, Address, IDType, IDNumber, RegistrationDate) 
+    VALUES 
+    ($1, $2, $3, $4, $5)
+  `;
+
+  try {
+    await pool.query(query, [fullName, address, idType, idNumber, registrationDate]);
+    res.status(201).send('Customer added successfully');
+  } catch (err) {
+    console.error('Error adding customer', err);
+    res.status(500).send('Failed to add customer');
+  }
+});
+
 //get all bookings
 app.get("/bookings", async (req, res) => {
   try {
@@ -48,6 +99,40 @@ app.get("/bookings", async (req, res) => {
     }
     const viewData = await pool.query(query);
     res.json(viewData.rows);
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//book customer
+app.post('/book', async (req, res) => {
+  const { roomId, customerFullName, employeeId, startDate, endDate } = req.body;
+
+  // SQL query to insert booking
+  const query = `
+    INSERT INTO Booking (RoomID, CustomerID, EmployeeID, StartDate, EndDate) 
+    VALUES 
+    ($1, (SELECT CustomerID FROM Customer WHERE FullName = $2), $3, $4, $5)
+  `;
+
+  try {
+    await pool.query(query, [roomId, customerFullName, employeeId, startDate, endDate]);
+    res.status(201).send('Booking created successfully');
+  } catch (err) {
+    console.error('Error creating booking', err);
+    res.status(500).send('Failed to create booking');
+  }
+});
+
+//get all employees
+app.get("/employees", async (req, res) => {
+  try {
+    const data = await pool.query(`
+      SELECT * FROM employee
+      ORDER BY employeeid ASC 
+    `);
+    res.json(data.rows);
   } catch (err) {
     console.error("Database query error:", err.message);
     res.status(500).json({ error: "Internal server error" });

@@ -69,6 +69,63 @@ export const getHotel = async (hotelId: number) => {
   }
 };
 
+export const getAllCustomers = async () => {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_HOST}customers`)
+    return response.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getCustomer = async (customerId: number) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_HOST}customer/${customerId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const getEmployees = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_HOST}employees`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const createCustomer = async (fullName: string, address: string, idType: string, idNumber: string) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_HOST}customer`, 
+      { fullName, address, idType, idNumber }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating customer:", error);
+    throw error;
+  }
+};
+
+export const createBooking = async (roomId: number, customerFullName: string, employeeId: number, startDate: string, endDate: string) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_HOST}book`,
+      { roomId, customerFullName, employeeId, startDate, endDate }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    throw error;
+  }
+};
+
 export const getView = async (viewNum: number) => {
   try {
     const response = await axios.get(
