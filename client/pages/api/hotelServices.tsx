@@ -39,9 +39,13 @@ export const getAllHotels = async (
   }
 };
 
-export const getHotelRooms = async (hotelId: number, start_date?: string, end_date?: string) => {
+export const getHotelRooms = async (
+  hotelId: number,
+  start_date?: string,
+  end_date?: string
+) => {
   try {
-    let query = ''
+    let query = "";
     if (start_date) {
       query += `?start_date=${start_date}`;
     }
@@ -69,7 +73,7 @@ export const getHotel = async (hotelId: number) => {
   }
 };
 
-export const getView = async (viewNum: number) => {
+export const getView = async (viewNum: string) => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_HOST}view${viewNum}/`
